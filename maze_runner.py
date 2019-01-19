@@ -132,7 +132,9 @@ plot = plt.imshow(game_map, cmap='gray')
 plt.ion()
 plt.show()
 
-last_key = ''
+last_key = 'up'
+distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
+record_data(distances, last_key)
 while True:
     plt.pause(0.000001)
     if last_key != '':
@@ -141,7 +143,7 @@ while True:
             draw_player(player, game_map)
             plt.imshow(game_map, cmap='gray')
             plt.draw()
-            distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
             record_data(distances, last_key)
+            distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
             print(list(zip(scan_angles, distances)))
         last_key = ''

@@ -10,7 +10,6 @@ def get_data():
     X = [num.split(',') for num in (line.split('\t')[0] for line in lines)]
     X = [[int(float(j)) for j in i] for i in X]
     Y = [line.split('\t')[1] for line in lines]
-
     return X, Y
 
 
