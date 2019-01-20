@@ -2,7 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 from math import sin, cos, radians
+import ctypes
+import time
 
+
+def mbox(title, text):
+    return ctypes.windll.user32.MessageBoxW(0, text, title, 0)
 
 # matplotlib handles points as (y, x), so the equations have y and x reversed
 def get_pixels(lines):
@@ -69,6 +74,9 @@ def record_data(distances, move):
 def draw_player(pos, game, color=100):
     for x in range(pos[0] - 1, pos[0] + 2):
         for y in range(pos[1] - 1, pos[1] + 2):
+            if game[x][y] == 255:
+                mbox("Game Over!", "you suck!")
+                exit()
             game[x][y] = color
     return
 
@@ -134,16 +142,17 @@ plt.show()
 
 last_key = 'up'
 distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
-record_data(distances, last_key)
 while True:
     plt.pause(0.000001)
-    if last_key != '':
-        if last_key in key_list:
-            player = get_player_pos(player, last_key, game_map)
-            draw_player(player, game_map)
-            plt.imshow(game_map, cmap='gray')
-            plt.draw()
-            record_data(distances, last_key)
-            distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
-            print(list(zip(scan_angles, distances)))
-        last_key = ''
+    if last_key in key_list:
+        start = time.time()
+        player = get_player_pos(player, last_key, game_map)
+        draw_player(player, game_map)
+        plt.imshow(game_map, cmap='gray')
+        plt.draw()
+        record_data(distances, last_key)
+        distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
+        # print(list(zip(scan_angles, distances)))
+        end = time.time()
+        print(end-start)
+    last_key = ''
