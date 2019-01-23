@@ -145,14 +145,11 @@ distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[la
 while True:
     plt.pause(0.000001)
     if last_key in key_list:
-        start = time.time()
         player = get_player_pos(player, last_key, game_map)
         draw_player(player, game_map)
+        plt.clf()
         plt.imshow(game_map, cmap='gray')
-        plt.draw()
         record_data(distances, last_key)
         distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
         # print(list(zip(scan_angles, distances)))
-        end = time.time()
-        print(end-start)
     last_key = ''
