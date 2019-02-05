@@ -3,8 +3,22 @@ import numpy as np
 import math
 from math import sin, cos, radians
 import ctypes
-import time
+import tensorflow as tf
 
+
+def create_model():
+    model = tf.keras.models.Sequential([
+        tf.keras.layers.Dense(64, activation=tf.nn.relu, input_shape=(37,)),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(32, activation=tf.nn.relu),
+        tf.keras.layers.Dropout(0.2),
+        tf.keras.layers.Dense(4, activation=tf.nn.softmax)
+    ])
+
+    model.compile(optimizer='adam',
+                  loss='sparse_categorical_crossentropy',
+                  metrics=['accuracy'])
+    return model
 
 def mbox(title, text):
     return ctypes.windll.user32.MessageBoxW(0, text, title, 0)
@@ -58,7 +72,7 @@ def laser_scan(game, player, angles, move, heading):
     distances = []
     for angle in angles:
         distances.append(get_distance(player, game, angle, heading))
-    return distances
+    return np.array(distances)
 
 
 def record_data(distances, move):
@@ -115,11 +129,9 @@ fig.canvas.mpl_connect('key_press_event', on_key)
 
 player = [5, 5]
 scan_angles = np.linspace(-180, 180, 37)
-print(scan_angles)
 draw_player(player, game_map)
 
 key_list = ['up', 'down', 'left', 'right']
-
 # tracking heading angle
 heading_angle = {'up': 180, 'right': 90, 'down': 0, 'left': 270}
 
@@ -142,6 +154,14 @@ plt.show()
 
 last_key = 'up'
 distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
+
+model = create_model()
+model.load_weights('./model_weights')
+prediction = model.predict(np.expand_dims(distances, 0))
+print(key_list[int(np.argmax(prediction))])
+last_key = ''
+auto = False
+
 while True:
     plt.pause(0.000001)
     if last_key in key_list:
@@ -151,5 +171,8 @@ while True:
         plt.imshow(game_map, cmap='gray')
         record_data(distances, last_key)
         distances = laser_scan(game_map, player, scan_angles, last_key, heading_angle[last_key])
+        prediction = model.predict(np.expand_dims(distances, 0))
+        if auto:
+            last_key = key_list[int(np.argmax(prediction))]
         # print(list(zip(scan_angles, distances)))
-    last_key = ''
+    # last_key = ''
