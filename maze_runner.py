@@ -165,6 +165,7 @@ model.load_weights('./model_weights')
 prediction = model.predict(np.expand_dims(distances, 0))
 print(key_list[int(np.argmax(prediction))])
 last_key = ''
+
 auto = False
 if auto:
     last_key = key_list[int(np.argmax(prediction))]
