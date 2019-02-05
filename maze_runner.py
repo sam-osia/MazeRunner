@@ -127,7 +127,7 @@ game_map.T[-1][:] = 255
 fig = plt.figure()
 fig.canvas.mpl_connect('key_press_event', on_key)
 
-player = [5, 5]
+player = [5, 85]
 scan_angles = np.linspace(-180, 180, 37)
 draw_player(player, game_map)
 
@@ -141,7 +141,12 @@ line_list = [[[20, 80], [15, 20]],
              [[75, 10], [60, 65]],
              [[60, 65], [25, 85]],
              [[98, 40], [45, 98]],
-             [[5, 86], [10, 92]]]
+             [[5, 86], [10, 92]],
+             [[1, 70], [8, 71]],
+             [[7, 40], [19, 46]],
+             [[24, 1], [28, 6]],
+             [[87, 24], [95, 35]],
+             [[69, 35], [80, 36]]]
 
 pixels = np.array(get_pixels(line_list))
 for pixel in pixels:
@@ -161,9 +166,18 @@ prediction = model.predict(np.expand_dims(distances, 0))
 print(key_list[int(np.argmax(prediction))])
 last_key = ''
 auto = False
+if auto:
+    last_key = key_list[int(np.argmax(prediction))]
 
 while True:
-    plt.pause(0.000001)
+    plt.pause(0.001)
+    if last_key == 'a':
+        auto = not auto
+        if auto:
+            last_key = key_list[int(np.argmax(prediction))]
+        else:
+            last_key = ''
+        print(auto)
     if last_key in key_list:
         player = get_player_pos(player, last_key, game_map)
         draw_player(player, game_map)
